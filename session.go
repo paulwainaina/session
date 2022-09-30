@@ -1,7 +1,6 @@
 package session
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -31,7 +30,19 @@ type SessionManager struct{
 }
 
 func NewSessionManager()(*SessionManager){
-	return &SessionManager{}
+	return &SessionManager{
+		Sessions:[]*Session{},
+	}
+}
+
+func (sessionManager * SessionManager) CreateSession(dur uint64 ,user interface{})(Session,error){
+	sess,err:=sessionManager.UserActiveSession(user)
+	if err==nil{
+		return Session{},fmt.Errorf("user has an active session %v ",sess.SessionID)
+	}
+	session :=NewSession(dur,user)
+	sessionManager.Sessions=append(sessionManager.Sessions,session)
+	return *session,nil
 }
 
 func (sessionManager * SessionManager)NumberofActiveSessions()(int){
